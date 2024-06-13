@@ -1,0 +1,656 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load social_share %}
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.3/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.0/html2canvas.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+
+
+
+<style>
+
+.bar {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+
+
+    }
+
+    .bar .left {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .bar .left input {
+        height: 5vh;
+    }
+
+
+    .hidden {
+        display: none;
+    }
+
+    #search-dropdown {
+        position: absolute;
+    }
+
+    @media print {
+        * {
+            background: transparent !important;
+            color: #000 !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
+            font-size: 100%;
+
+        }
+
+        .bar,
+        #nav1,
+        header {
+            display: none;
+        }
+
+        #div2 {
+            position: absolute;
+            top: -100px;
+            text-align: center;
+            width: 100%;
+        }
+
+
+    }
+
+
+    #customizeMenu{
+        width: fit-content;
+        height: 50vh;
+        overflow-y: auto;
+    }
+
+    :root {
+        --body-bg: rgb(204, 204, 204);
+        --white: #ffffff;
+        --darkWhite: #ccc;
+        --black: #000000;
+        --dark: #615c60;
+        --themeColor: #dfbc0c;
+        --pageShadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+    }
+    @media print {
+        body{
+            visibility: hidden !important;
+            /* background-color: white; */
+        }
+
+        .printContainer {
+            visibility: visible !important;
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: large;
+        }
+
+    }
+
+    .page {
+        background: var(--white);
+        display: block;
+        margin: 0 auto;
+        position: relative;
+        box-shadow: var(--pageShadow);
+    }
+
+    .page[size="A4"] {
+        width: 99%;
+        height: 29.7cm;
+        overflow: hidden;
+    }
+    #reportTable {
+    border-collapse: collapse;
+    width: 100%;
+    }
+
+    #reportTable th, #reportTable td {
+    border: 1px solid #dddddd;
+    padding: 5px 2px;
+    color: #000;
+    }
+
+    /* .whatsapp-this{
+      display: flex;
+      justify-content: center;
+      cursor: pointer;
+      padding: 4px 0px;
+    }
+
+    .whatsapp-this:hover{
+      background-color: rgb(255 255 255 / 0.21);
+    } */
+
+
+    .submitShareEmailBtn {
+        background: #192d3e;
+        border: 1px solid #3a4b5a;
+        border-radius: 4px;
+        color: white;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+    }
+    .submitShareEmailBtn:hover {
+        background: #3a4b5a;
+    }
+
+
+
+    .content {
+        display: none;
+        position: absolute;
+        background-color: black;
+        min-width: 350px;
+        min-height: 250px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        height: fit-content;
+        z-index: 1;
+    }
+
+    .arrow {
+        /* font-size: 0.6em; */
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .arrow.up {
+        transform: rotate(180deg);
+    }
+
+    /* Set the color of the datepicker icon to white */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+.dropdown-item.customers-options:hover{
+    background: blue !important;
+    color: white !important;
+    cursor: pointer;
+  }
+
+
+</style>
+
+
+
+
+<body>
+
+    <div class="body-wrapper">
+        <div class="container-fluid ">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb text-light">
+                    {% if log_details.user_type == 'Staff' %}
+                        <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning">Dashboard</a></li>
+                    {% endif %}
+                    {% if log_details.user_type == 'Company' %}
+                        <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning">Dashboard</a></li>
+                    {% endif %}
+                    <li class="breadcrumb-item" aria-current="page">Item Report By Party</li>
+                </ol>
+            </nav>
+
+            <div> 
+
+                <div class=" mt-lg-4 mt-2 rounded p-4" style="background-color: rgb(0, 0, 0);color: white;">
+                    <h1 class="text-light">Item Report By Party</h1>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-6 d-flex p-2 ">
+
+                            <div class="col-md-6">
+                              <div class="position-relative">
+                                  <button class="btn btn-warning" onclick="toggleContent()"><i class="fas fa-solid fa-gear"></i> Customize Report</button>
+                                  <div id="contentDiv" class="content">
+                                      <h6 style="color: white;">Customize Report</h6>
+                                      <form action="{% url 'item_report_by_party_customized' %}" class="form reportCustomizeForm" method="post">
+                                        {% csrf_token %}
+                                          <div class="px-2">
+                                              <label style="text-align:left ">From</label><br>
+                                              <input name="from_date" class="inputdate form-control text-light" type="date" id="startDate" value="{{startDate}}" >
+                                              
+                                          </div> 
+                                          <div class="px-2">
+                                              <label style="text-align:left ">To</label><br>
+                                              <input name="to_date" type="date" class="inputdate form-control text-light" id="endDate" value="{{endDate}}">
+                                          </div>
+                                          <div class="px-2">
+                                              <label style="text-align:left;color: white;">Party</label><br>
+                                              <div class="p-0 border-0 bg-none position-relative drop-box">
+                                                <input hidden name="type_of_party" id="typeofparty" type="text">
+                                                <input hidden name="party_id" id="partyid" type="text">
+                                                <input required type="text" id="party" value="" name="customer" class="dropdown-toggle form-control text-white customers-display" onkeyup="filterCustomers()" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Select Party.." autocomplete="off">
+                                                <ul class="dropdown-menu w-100 customers-available position-absolute bg-black text-white" id="cust_drop"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
+                                                    <li class="dropdown-item customers-options text-white">Select Party</li>
+
+                                                    <li class="dropdown-header text-dark" style="background-color: white;">Customers</li>
+
+                                                    {% for c in customers %}
+                        
+                                                    <li class="dropdown-item customers-options text-white" onclick="get_customer_id_report(`{{c.id}}`,this.innerHTML)">{{c.title}} {{c.first_name}} {{c.last_name}}</li>
+                                                
+                                                    {% endfor %}
+
+                                                    <li class="dropdown-header text-dark" style="background-color: white;">Vendors</li>
+
+                                                    {% for v in vendors %}
+                        
+                                                    <li class="dropdown-item customers-options text-white" onclick="get_vendor_id_report(`{{v.id}}`,this.innerHTML)">{{v.title}} {{v.first_name}} {{v.last_name}}</li>
+                                                
+                                                    {% endfor %}
+
+                                                </ul>
+                                                
+                                            </div>
+                                          </div>
+                                          <div class="d-flex px-2 mt-3 mb-4">
+                                              <button type="submit" class="btn btn-outline-light w-50">Run Report</button>
+                                              <button type="reset" onclick="toggleContent()" class="btn btn-outline-light ml-1 w-50">Cancel</button>
+                                          </div>
+                                      </form>
+                                  </div>
+                              </div>
+                            </div>
+                            
+                                
+                                
+                        </div>
+                        <div class="col-md-6 d-flex justify-content-end h-100 p-2">
+                           
+                            <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;" id="exportBtn" onclick="ExportToExcel()" class="btn btn-outline-warning" >
+                                <i class="fa fa-file-excel p-1" style="font-size: large;"></i>
+                                <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center" >Export</span>
+                              </a>&nbsp;&nbsp;
+                            
+                            <!-- <a href="#" id="importBtn" class="btn btn-outline-warning ms-1">
+                                <i class="fa fa-file-import ms-1" style="color: #FFD43B;" aria-hidden="true"></i> Import
+                            </a> -->
+                            <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;" class="btn btn-outline-warning" id="pdfBtn" onclick="reportPDF()" >
+                                <i class="fa fa-file-pdf  p-1" style="font-size: large;"></i>
+                                <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Pdf</span>
+                              </a>&nbsp;&nbsp;
+                              <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;" class="btn btn-outline-warning"   id="printBtn" onclick="printSection('printReport')">
+                                <i class="fa fa-print  p-1" style="font-size: large;"></i>
+                                <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Print</span>
+                              </a>&nbsp;&nbsp;
+                              <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;" class="btn btn-outline-warning"  title="SHARE" id="share_btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-share p-1" style="font-size: large;"></i>
+                                <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Share</span>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="share_btn">
+                                <li class="" style="color: #000;">{% post_to_whatsapp object_or_url "WhatsApp" %}</li>
+                                <!-- <a class="dropdown-item text-black">{% post_to_whatsapp object_or_url "WhatsApp" %}</a> -->
+                                <a class="dropdown-item text-black" data-toggle="modal" id="toggleEmailModal">Email</a>
+                            </div>
+                        </div>
+
+
+                        <!-- price lists table -->
+                        <div class="table-responsive " style="overflow-x:auto;margin-top: 20px;">
+                            <div class="card radius-15 print-only" id="pdf-card" style="background-color: #000;" >
+                                <div class="card-body">
+                                    <div class="container-fluid">
+                        
+                                        <div  id="printReport"  class="printReportTemplate" style="display: block;">
+                                            <div class="my-5 page" size="A4" >
+                                                <div id="printdiv2">
+                                                    <div class="py-4 bg-warning" >
+                                                        <!-- <div id="ember2512" class="col-md-4 d-flex justify-content-start tooltip-container ember-view ribbon text-ellipsis"></div> -->
+                                                        <div class="col-12">
+                                                                <center class="h5 text-white"><b>{{company.company_name}}</b></center>
+                                                                <center class="h3 text-white"><b>ITEM REPORT BY PARTY</b></center>
+                                                                {% if start_date and end_date %}
+                                                                <center class="h6 text-white">{{start_date | date:'d-m-Y'}} TO {{end_date | date:'d-m-Y'}}</center>
+                                                                {% endif %}
+                                                        </div>  
+                                                        <!-- <div class="col-md-4 d-flex justify-content-end"></div> -->
+                                                    </div>
+                                                    <div class="row px-1 py-1">
+                                                        <div class="col-12">
+                                                            <section class="balance-info text-dark">
+                                                                <div class="row p-4">
+                                                                    <div class="col-10">
+                                                                        <div class="row mb-2">
+                                                                            <div class="col-10" ><h3>Party : {{party.title}} {{party.first_name}} {{party.last_name}}</h3>
+                                                                            </div><br><br>
+                                                                        </div>
+                                                    
+                                                                    </div>
+
+                                                                </div>
+                                                            </section>
+
+
+                        
+                                                            <section class="product-area mt-2">
+                                                                <table class="table table-responsive-md mt-4 table-hover" id="reportTable">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th class="text-center">ITEM NAME </th>
+                                                                            <th class="text-center">SALES QUANTTY</th>
+                                                                            <th class="text-center">SALES AMOUNT</th>
+                                                                            <th class="text-center">PURCHASE QUANTTY</th>
+                                                                            <th class="text-center">PURCHASE AMOUNT</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {% for key, row in item_report.items %}
+                                                                        <tr>
+                                                                            <td class="text-center">{{ row.0 }}</td>
+                                                                            <td class="text-center">{{ row.1 }}</td>
+                                                                            <td class="text-center">Rs. {{ row.2 |default:0|floatformat:2 }}</td>
+                                                                            <td class="text-center">{{ row.3 }}</td>
+                                                                            <td class="text-center">Rs. {{ row.4 |default:0|floatformat:2 }}</td>
+                                                                        </tr>
+                                                                        {% endfor %}
+                                                                    </tbody>
+                                                                </table>
+                                                            </section>
+                                                
+                                                            <section class="balance-info text-dark">
+                                                                <div class="row p-4 justify-content-end">
+                                                                    <div class="col-10">
+                                                                        <div class="row mb-2 justify-content-end">
+                                                                            <div class="col-4"><b>Total Sales Qty: </b><p id="purchase" style="font-size: 19px;"><span id="totalReccuringinvoice"><b>{{total_sales_quantity|default:0}}</b></span></p></div>
+                                                                            <div class="col-4"><b>Total Purchase Qty: </b><p id="expense" style="font-size: 19px;"><span id="totalCreditnote"><b>{{total_purchase_quantity|default:0}}</b></span></p></div>
+                                                                        </div>
+                                                    
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row p-4 justify-content-end">
+                                                                    <div class="col-10">
+                                                                        <div class="row mb-2 justify-content-end">
+                                                                            <div class="col-4"><b>Total Sales Amount: </b><p id="purchase" style="font-size: 19px;">Rs. <span id="totalReccuringinvoice"><b>{{total_sales_amount|default:0|floatformat:2}}</b></span></p></div>
+                                                                            <div class="col-4"><b>Total Purchase Amount: </b><p id="expense" style="font-size: 19px;">Rs. <span id="totalCreditnote"><b>{{total_purchase_amount|default:0|floatformat:2}}</b></span></p></div>
+                                                                        </div>
+                                                    
+                                                                    </div>
+                                                                </div>
+                                                            </section>
+                                                        </div>
+                                                            
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal fade" id="shareToEmail">
+                            <div class="modal-dialog">
+                              <div class="modal-content" style="background-color: #3b3b3b;">
+                                <div class="modal-header">
+                                  <h3 class="modal-title text-light" id="exampleModalLabel">Share Share By Customer</h3>
+                                  <button type="button" id="close_button" class="btn close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body mx-3" style="background-color: #000;">
+                                  <form id="share_to_email_form" action="{% url 'shareItemReportByPartyToEmail' %}" method="POST">
+                                    {%csrf_token%}
+                                    <div class="form-group">
+                                        <label for="emailIds">Email IDs</label>
+                                        <textarea class="form-control" name="email_ids" id="emailIds" rows="3" placeholder="Multiple emails can be added by separating with a comma(,)." required></textarea>
+                                    </div>
+                                    <div class="form-group mt-2">
+                                        <label for="item_unitname">Message(optional)</label>
+                                        <textarea name="email_message" id="email_message" class="form-control" cols="" rows="4" placeholder="This message will be sent along with Bill details."></textarea>
+                                    </div>
+                                    <input type="text" name="party_Id" id="party_id" value="{{party_id}}" hidden>
+                                    <input type="text" name="party_Type" id="party_type" value="{{party_type}}" hidden>
+                                    <input type="date" name="start" id="startDaten" value="{{start_date | date:'Y-m-d'}}" hidden>
+                                    <input type="date" name="end" id="endDaten" value="{{end_date  | date:'Y-m-d'}}" hidden>
+                                    <div class="row mt-3">
+                                      <div class="col-md-4"></div>
+                                      <div class="col-md-4">
+                                        <div class="d-flex">
+                                          <button class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" type="button" id="share_with_email">Send</button> 
+                                          <input class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" type="reset" value="Close">
+                                        </div>
+                                      </div>
+                                      <div class="col-md-4"></div>
+                                    </div>
+                                  </form>
+                                </div>
+                                <div class="modal-footer"></div>
+                              </div>
+                            </div>
+                        </div>
+
+
+
+
+
+
+        
+
+
+
+
+
+    </div>
+
+    <script>
+        function toggleContent() {
+            var contentDiv = document.getElementById("contentDiv");
+            if (contentDiv.style.display === "block") {
+                contentDiv.style.display = "none";
+            } else {
+                contentDiv.style.display = "block";
+                // Position the div just below the button
+                // var buttonRect = event.target.getBoundingClientRect();
+                // contentDiv.style.top = (buttonRect.bottom + window.scrollY) + "px";
+                // contentDiv.style.left = buttonRect.left + "px";
+            }
+        }
+
+
+        function get_customer_id_report(custId, name){
+                $('#party').val(name)
+                $('#typeofparty').val(1)
+                $('#partyid').val(custId)
+            }
+
+        function get_vendor_id_report(vendId, name){
+            $('#party').val(name)
+            $('#typeofparty').val(2)
+            $('#partyid').val(vendId)
+        }
+
+
+        function filterCustomers(){
+            var options = $('#cust_drop').children();
+            var search_text = $("#party").val().toLowerCase();
+            options.each(function(){
+                if($(this).text().toLowerCase().includes(search_text)){
+                    $(this).show()
+                }else{
+                    $(this).hide()
+                }
+            })
+        }
+
+        function ExportToExcel(){
+                const Table = document.getElementById("reportTable");
+                const ws = XLSX.utils.table_to_sheet(Table);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+                XLSX.writeFile(wb, "Item_Report_By_Party.xlsx");
+            }
+
+        function reportPDF(){
+            var element = document.getElementById('printReport');
+            var opt =
+            {
+                margin: [0.5, 0.3, 0.3, 0.5],
+                filename: 'Item_Report_By_Party',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function printSection(sectionId) {
+            document.body.style.backgroundColor = 'white';
+            var printContents = document.getElementById(sectionId).innerHTML;
+            var originalContents = document.body.innerHTML;
+            var $printerDiv = $('<div class="printContainer"></div>');
+    
+            $printerDiv.html(printContents); 
+            $('body').append($printerDiv).addClass("printingContent"); 
+            window.print(); 
+            $printerDiv.remove();
+            $('body').removeClass("printingContent");
+            document.body.style.backgroundColor = 'rgb(30,30,30)';
+        }
+
+
+        $('#toggleEmailModal').on('click',function(){
+            var st = $('#startDate').val();
+            var end = $('#endDate').val();
+            var trns = $('#salesTransactions').val();
+    
+            $('#trans').val(trns)
+            $('#startDt').val(st)
+            $('#endDt').val(end)
+    
+            if((st != "" && end == "") || (st == "" && end != "")){
+            alert('Please select both date inputs or select none')
+            return
+            }
+    
+            $('#shareToEmail').modal('toggle');
+        });
+    
+        $(document).ready(function(){
+            $('#share_with_email').on('click',function(){
+                var emailsInput = document.getElementById('emailIds');
+                var emailsString = emailsInput.value.trim();
+    
+                var emails = emailsString.split(',').map(function(email) {
+                    return email.trim();
+                });
+    
+                var emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+    
+                var invalidEmails = []
+                if(emailsString == ""){
+                    alert('Enter valid email addresses..')
+                }
+                else{
+                    for (var i = 0; i < emails.length; i++) {
+                        var currentEmail = emails[i];
+    
+                        if (currentEmail!="" && !emailRegex.test(currentEmail)) {
+                            console.log(currentEmail + ' is invalid!');
+                            invalidEmails.push(currentEmail)
+                        }
+                    }
+                    
+                    if(invalidEmails.length > 0){
+                        alert('Invalid emails..Please check!\n'+invalidEmails)
+                        // alert(invalidEmails)
+                    }else{
+                        // $('#share_to_email_form').submit();
+                        var emailids = $('#emailIds').val();
+                        var emailmessages = $("#email_message").val();
+                        var startdate = $("#startDaten").val();
+                        var enddate = $("#endDaten").val();
+                        var partyID = $("#party_id").val();
+                        var partyType = $("#party_type").val();
+                        $('#shareToEmail').modal('hide');
+                        document.getElementById("share_to_email_form").reset();
+
+
+
+                        $.ajax({
+                            type : 'POST',
+                            url:"{% url 'shareItemReportByPartyToEmail' %}",
+                            data:{
+                                'email_ids' : emailids,
+                                'email_message' : emailmessages,
+                                'start_date' : startdate,
+                                'end_date' : enddate,
+                                'party_id' : partyID,
+                                'party_type' : partyType,
+                                csrfmiddlewaretoken: '{{ csrf_token }}'
+                            },
+                            
+                            success: function(response) {
+                                if(response.status){
+                                    
+                                    if (response.status){
+                                        $('#alert_danger').text(response.message);
+                                    }else{
+                                        $('#alert_danger').text(response.message);
+                                    }
+
+                                }else{
+                                    alert("Something went wrong.!")
+                                }
+                            },         
+                        });
+
+                    }
+                }
+            })
+        });
+
+        $(document).ready(function() {
+            $('#close_button').click(function() {
+            $('#shareToEmail').modal('hide');
+            });
+        });
+
+
+
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+</body>
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

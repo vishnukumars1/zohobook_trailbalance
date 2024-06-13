@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zoho</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>
+        #table1 {
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        #table1 th,
+        #table1 td {
+            border: 1px solid #dddddd;
+            padding: 8px;
+            text-align: center;
+            word-wrap: break-word;
+        }
+
+        #table1 th {
+            background-color: #f2f2f2;
+        }
+
+        #table1 th.payment-method,
+        #table1 td.payment-method {
+            width: 130px;
+        }
+
+        #table1 th.running-balance,
+        #table1 td.running-balance {
+            width: 130px;
+        }
+
+        #table1 th.type-number,
+        #table1 td.type-number {
+            width: 140px;
+        }
+
+        #table1 th.total,
+        #table1 td.total {
+            width: 150px;
+        }
+
+        body {
+            font-size: 14px;
+        }
+
+        .invoice_data {
+            font-size: 1.2rem;
+        }
+
+        .data_row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .data_1,
+        .data_2 {
+            font-weight: bold;
+        }
+
+        .data_value {
+            flex: 1;
+            text-align: right;
+        }
+
+        .balance_info {
+            display: flex;
+            justify-content: start;
+            align-items: center;
+        }
+
+        .balance_info .bal_head {
+            width: 48%;
+        }
+
+        .bal_value {
+            width: 48%;
+            flex: 1;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="my-5 page" size="A4">
+        <div class="p-5">
+            <div id="ember2512" class="row tooltip-container ember-view text-ellipsis"
+                style="display: flex; justify-content: space-between;">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <center style="color: black;">
+                        <p>{{ cmp.company_name }}</p>
+                        <b>
+                            <p style="font-size: 1.3rem;">Party Statement</p>
+                        </b>
+                    </center>
+                    {% if startDate and endDate %}
+                    <center class="h6 text-white">{{ startDate }} TO {{ endDate }}</center>
+                    {% endif %}
+                </div>
+            </div>
+            <hr>
+            <section class="mt-4">
+                <table class="table2" id="table1">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th class="type-number">Type Number</th>
+                            <th class="payment-method">Payment Method</th>
+                            <th class="total">Total</th>
+                            <th class="running-balance">Running Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for o in order %}
+                        <tr>
+                            <td>{{ o.sales_order_date }}</td>
+                            <td>Sale Order</td>
+                            <td class="type-number">{{ o.sales_order_number }}</td>
+                            <td class="payment-method">{{ o.payment_method }}</td>
+                            <td class="total">{{ o.sub_total }}</td>
+                            <td class="running-balance">{{ o.balance }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% for po in purchase_order %}
+                        <tr>
+                            <td>{{ po.purchase_order_date }}</td>
+                            <td>Purchase Order</td>
+                            <td class="type-number">{{ po.sales_order_number }}</td>
+                            <td class="payment-method">{{ po.payment_method }}</td>
+                            <td class="total">{{ po.sub_total }}</td>
+                            <td class="running-balance">{{ po.balance }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% for i in invoice %}
+                        <tr>
+                            <td>{{ i.date }}</td>
+                            <td>Invoice</td>
+                            <td class="type-number">{{ i.invoice_number }}</td>
+                            <td class="payment-method">{{ i.payment_method }}</td>
+                            <td class="total">{{ i.sub_total }}</td>
+                            <td class="running-balance">{{ i.balance }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% for d in deliverychallan %}
+                        <tr>
+                            <td>{{ d.challan_date }}</td>
+                            <td>Delivery Challan</td>
+                            <td class="type-number">{{ d.challan_number }}</td>
+                            <td class="payment-method"></td>
+                            <td class="total">{{ d.sub_total }}</td>
+                            <td class="running-balance">{{ d.balance }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% for d in recurringinvoice %}
+                        <tr>
+                            <td>{{ d.start_date }}</td>
+                            <td>Recurring Invoice</td>
+                            <td class="type-number">{{ d.rec_invoice_no }}</td>
+                            <td class="payment-method">{{ d.payment_method }}</td>
+                            <td class="total">{{ d.subtotal }}</td>
+                            <td class="running-balance">{{ d.balance }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% for d in estimate %}
+                        <tr>
+                            <td>{{ d.estimate_date }}</td>
+                            <td>Estimate</td>
+                            <td class="type-number">{{ d.estimate_number }}</td>
+                            <td class="payment-method"></td>
+                            <td class="total">{{ d.sub_total }}</td>
+                            <td class="running-balance"></td>
+                        </tr>
+                        {% endfor %}
+                        {% for d in creditnote %}
+                        <tr>
+                            <td>{{ d.credit_note_date }}</td>
+                            <td>Credit note</td>
+                            <td class="type-number">{{ d.credit_note_number }}</td>
+                            <td class="payment-method">{{d.payment_method}}</td>
+                            <td class="total">{{ d.sub_total }}</td>
+                            <td class="running-balance">{{ d.balance }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% for d in retainerinvoice %}
+                        <tr>
+                            <td>{{ d.retainer_invoice_date }}</td>
+                            <td>Retainer Invoice</td>
+                            <td class="type-number">{{ d.retainer_invoice_number }}</td>
+                            <td class="payment-method">{{d.payment_method}}</td>
+                            <td class="total">{{ d.total_amount }}</td>
+                            <td class="running-balance">{{ d.balance }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% for d in bill %}
+                        <tr>
+                            <td>{{ d.Bill_Date }}</td>
+                            <td>Bill</td>
+                            <td class="type-number">{{ d.Bill_Number }}</td>
+                            <td class="payment-method">{{d.Payment_Method}}</td>
+                            <td class="total">{{ d.Sub_Total }}</td>
+                            <td class="running-balance">{{ d.Balance }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% for d in recurring_bill %}
+                        <tr>
+                            <td>{{ d.rec_bill_date }}</td>
+                            <td>Recurring Bill</td>
+                            <td class="type-number">{{ d.recc_bill_no }}</td>
+                            <td class="payment-method">{{d.payment_type}}</td>
+                            <td class="total">{{ d.sub_total }}</td>
+                            <td class="running-balance">{{ d.bal }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% for d in expense %}
+                        <tr>
+                            <td>{{ d.date }}</td>
+                            <td>Expense</td>
+                            <td class="type-number">{{ d.expense_number }}</td>
+                            <td class="payment-method">{{ d.payment_type }}</td>
+                            <td class="total">{{ d.amount }}</td>
+                            <td class="running-balance">{{ d.balance }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% for d in recurring_expense %}
+                        <tr>
+                            <td>{{ d.exp_date }}</td>
+                            <td>Recurring Expense</td>
+                            <td class="type-number">{{ d.expense_number }}</td>
+                            <td class="payment-method">{{ d.Payment_Method }}</td>
+                            <td class="total">{{ d.amount }}</td>
+                            <td class="running-balance">{{ d.balance }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% for d in manual_journel %}
+                        <tr>
+                            <td>{{ d.date }}</td>
+                            <td>Manual Journel</td>
+                            <td class="type-number">{{ d.journal_no }}</td>
+                            <td class="payment-method">{{ d.payment_type }}</td>
+                            <td class="total">{{ d.sub_total }}</td>
+                            <td class="running-balance">{{ d.bal }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+            <hr>
+        </div>
+    </div>
+</body>
+
+</html>

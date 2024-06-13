@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinsYs</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid #dddddd;
+        padding: 5px 2px;
+        /* text-align: left; */
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    body {
+        font-size: 14px;
+    }
+
+    .invoice_data {
+        font-size: 1.2rem;
+    }
+
+    .data_row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .data_1, .data_2 {
+        font-weight: bold;
+    }
+
+    .data_value {
+        flex: 1;
+        text-align: right;
+    }
+
+    
+</style>
+
+<body>
+    <div class="my-5 page" size="A4">
+        <div class="p-5">
+            <div id="ember2512" class="row tooltip-container ember-view text-ellipsis"
+                style="display: flex; justify-content: space-between;">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <center style="color: black;">
+                        <b>
+                            <p style="font-size: 1.3rem;">REPORT - SALES SUMMARY BY HSN </p>
+                        </b>
+                        <p>
+                            {{cmp.company_name}}<br>
+                            {% if from_date and to_date %}
+                         
+                    <center class="h6 text-dark ">{{from_date|date:'Y-m-d'}} TO {{to_date|date:'Y-m-d'}}</center>
+                                {% endif %}
+                        </p>
+                    </center>
+                    <center class="h6 text-dark ">PLACE OF SUPPLY : {{place}}</center>
+                </div>
+                <hr>
+                <div style="width: 100%;">
+                    <div class="invoice_data">
+                        <div class="data_row">
+
+                        </div>
+                        <div class="data_row">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <section class="mt-4">
+                <table class="table table-responsive-md mt-4 table-hover " id="reportTable" >
+                    <thead>
+                        <tr>
+                            <th class="text-center">HSN</th>
+                            <th class="text-center">Total Value</th>
+                            <th class="text-center">Taxable Value</th>
+                            <th class="text-center">IGST</th>
+                            <th class="text-center">CGST</th>
+                            <th class="text-center">SGST</th>
+                            
+                            
+                            <th class="text-center">Add Cess</th>
+                            
+                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item_hsn, i in combined_summary.items %}
+                        <tr>
+                     <td class="text-center p-3">{{item_hsn}}</td>
+                     <td class="text-center p-3">{{i.item_total}}</td>
+                     <td class="text-center p-3">{{i.calculated_tax}}</td>
+                     <td class="text-center p-3">{{i.igst}}</td>
+                     <td class="text-center p-3">{{i.cgst}}</td>
+                     <td class="text-center p-3">{{i.sgst}}</td>
+                      <td class="text-center p-3">0</td>
+                            
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            
+                <div class="row" style="text-align: right; padding: 20px;">
+                    <h5 style=" color: #000; font-weight: bold;">Total Value</h5>
+                    <h4 class="text-dark" style="font-weight: 300;" id="totvalue">
+                        <span id="superTotal">RS.{{grand_total|default:0|floatformat:2}}</span>
+                    </h4>
+                </div> 
+        </div></div></div></div></div></div></div></div></div>
+       
+                
+            </section>
+            <hr>
+           
+        </div>
+    </div>
+</body>
+
+</html>

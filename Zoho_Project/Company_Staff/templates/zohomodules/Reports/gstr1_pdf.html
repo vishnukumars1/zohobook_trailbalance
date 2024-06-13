@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<style>
+  .uppercase {
+    text-transform: uppercase;
+  }
+
+  @page{
+    size: A4 landscape;
+    margin: 0; /* Adjust margin as needed */
+  }
+</style> 
+
+<body>
+  <div id="transactiondata" class="p-2">
+
+    <fieldset8 class="p-2">
+      <div class="row text-dark ">
+        <div class="col-md-8">
+          <h6 class="text-uppercase py-2">{{ cmp.company_name }}
+          </h6>
+        
+         <p> {{ cmp.contact }} <br>
+          {{ cmp.address }} <br>
+          {{ cmp.city }} <br>
+          {{ cmp.state|slice:'5:' }},
+          {{ cmp.country }} <br>
+          {{ cmp.pincode }}
+        </p>
+
+
+        </div>
+        
+      <div>
+        <h6 class="text-dark text-uppercase py-2">REPORT - GSTR1</h6>
+
+        <section>
+          <center style="color: black;">
+            <h4>Invoice Details</h4>
+          </center>
+          <table class="transaction_table table text-dark border mb-4" id="chequesTable" style="border-collapse: collapse; width: 100%;">
+            <thead style="border: 1px solid black;">
+              <tr style="border: 1px solid black;">
+                <th style="text-transform: uppercase;">GSTIN/UIN</th>
+                <th style="text-transform: uppercase;">Party Name</th>
+                <th style="text-transform: uppercase;">Invoice No</th>
+                <th style="text-transform: uppercase;">Date</th>
+                <th style="text-transform: uppercase;">Value</th>
+                <th style="text-transform: uppercase;">Tax Rate</th>
+                <th style="text-transform: uppercase;">Cess Rate</th>
+                <th style="text-transform: uppercase;">Taxable Value</th>
+                <th style="text-transform: uppercase;">Integrated Tax</th>
+                <th style="text-transform: uppercase;">Central Tax</th>
+                <th style="text-transform: uppercase;">State/UT Tax</th>
+                <th style="text-transform: uppercase;">Cess</th>
+                <th style="text-transform: uppercase;">Place Of Supply</th>
+              </tr>
+            </thead>
+            <tbody>
+   
+  
+              {% for i in reportData %}
+              <tr  style="border: 1px solid black; text-align: center;">
+                <td style="text-align: center;">{{i.gstin}}</td>
+                <td style="text-align: center;">{{i.partyName}}</td>
+                <td style="text-align: center;">{{i.ref}}</td>
+                <td style="text-align: center;">{{i.date}}</td>
+                <td style="text-align: center;">{{i.total}}</td>
+                <td style="text-align: center;">{{i.tax_amount}}</td>
+                <td style="text-align: center;">0</td>
+                <td style="text-align: center;">{{i.subtotal}}</td>
+                <td style="text-align: center;">{{i.igst}}</td>
+                <td style="text-align: center;">{{i.cgst}}</td>
+                <td style="text-align: center;">{{i.sgst}}</td>
+                <td style="text-align: center;">0</td>
+                <td style="text-align: center;">{{i.place_of_supply}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </section>
+
+        <section>
+          <center style="color: black;">
+            <h4>Credit Note Details</h4>
+          </center>
+          <table class="transaction_table table text-dark border mb-4" id="chequesTable" style="border-collapse: collapse; width: 100%;">
+            <thead style="border: 1px solid black;">
+              <tr style="border: 1px solid black;">
+                <th style="text-transform: uppercase;">GSTIN/UIN</th>
+                <th style="text-transform: uppercase;">Party Name</th>
+                <th style="text-transform: uppercase;">Invoice No</th>
+                <th style="text-transform: uppercase;">Invoice Type</th>
+                <th style="text-transform: uppercase;">Note No.</th>
+                <th style="text-transform: uppercase;">Note Date</th>
+                <th style="text-transform: uppercase;">Tax Rate</th>
+                <th style="text-transform: uppercase;">Cess Rate</th>
+                <th style="text-transform: uppercase;">Taxable Value</th>
+                <th style="text-transform: uppercase;">Integrated Tax</th>
+                <th style="text-transform: uppercase;">Central Tax</th>
+                <th style="text-transform: uppercase;">State/UT Tax</th>
+                <th style="text-transform: uppercase;">Cess</th>
+                <th style="text-transform: uppercase;">Place Of Supply</th>
+              </tr>
+            </thead>
+            <tbody>
+   
+  
+              {% for i in cNotedata %}
+              <tr  style="border: 1px solid black; text-align: center;">
+                <td style="text-align: center;">{{i.gstin}}</td>
+                <td style="text-align: center;">{{i.partyName}}</td>
+                <td style="text-align: center;">{{i.ref}}</td>
+                <td style="text-align: center;">{{i.date}}</td>
+                <td style="text-align: center;">{{i.total}}</td>
+                <td style="text-align: center;">{{i.tax_amount}}</td>
+                <td style="text-align: center;">0</td>
+                <td style="text-align: center;">{{i.subtotal}}</td>
+                <td style="text-align: center;">{{i.igst}}</td>
+                <td style="text-align: center;">{{i.cgst}}</td>
+                <td style="text-align: center;">{{i.sgst}}</td>
+                <td style="text-align: center;">0</td>
+                <td style="text-align: center;">{{i.place_of_supply}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </section>
+
+         
+      </div>
+    </fieldset8>
+  </div>
+ 
+</body>
+</html>
+
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.9.6" ></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Check if there's a success message and trigger SweetAlert -->
+
