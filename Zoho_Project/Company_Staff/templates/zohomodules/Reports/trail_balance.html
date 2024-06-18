@@ -273,8 +273,7 @@
                                 <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Share</span>
                             </a>
                             <div class="dropdown-menu ps-4" aria-labelledby="share_btn">
-                                <a class="" style="color: #000;text-decoration: none;">{% post_to_whatsapp object_or_url
-                                    "WhatsApp" %}</a>
+                                <a class="" style="color: #000;text-decoration: none;">{% post_to_whatsapp object_or_url "WhatsApp" %}</a>
                                 <!-- <a class="dropdown-item text-black">{% post_to_whatsapp object_or_url "WhatsApp" %}</a> -->
                                 <a class="dropdown-item text-black ps-0" data-toggle="modal" id="toggleEmailModal"><i
                                         class="bi bi-envelope"></i> Email</a>
@@ -342,7 +341,7 @@
                                                                     <tr class="clickable-row">
 
                                                                         <td>LOANS</td>
-                                                                        <td class="text-center">0</td>
+                                                                        <td class="text-center">{{ total_debit|default:0|floatformat:2 }}</td>
                                                                         <td class="text-center">{{ total_credit|default:0|floatformat:2 }}</td>
 
                                                                     </tr>
@@ -360,7 +359,7 @@
                                                                     <tr class="hidden">
                                                                         <td style="opacity: 0.5;">BANK LOANS</td>
                                                                         
-                                                                        <td class="text-center">{{total_deb}}</td>
+                                                                        <td class="text-center">{{ total_debit|default:0|floatformat:2 }}</td>
                                                                         
                                                                         <td class="text-center">{{ total_credit|default:0|floatformat:2 }}</td>
                                                                     </tr>
@@ -368,8 +367,8 @@
                                                                     <tr class="clickable-row">
 
                                                                         <td>CURRENT LIABILITIES</td>
-                                                                        <td class="text-center">0</td>
-                                                                        <td class="text-center">0</td>
+                                                                        <td class="text-center">0.00</td>
+                                                                        <td class="text-center">{{ total_cus|default:0|floatformat:2 }}</td>
 
                                                                     </tr>
 
@@ -385,15 +384,17 @@
                                                                     </tr>
                                                                     <tr class="hidden clickable-row">
                                                                         <td style="opacity: 0.5;">SUNDRY CREDITORS</td>
-                                                                        <td class="text-center">0</td>
-                                                                        <td class="text-center">0</td>
+                                                                        <td class="text-center">0.00</td>
+                                                                        <td class="text-center">{{ total_cus|default:0|floatformat:2 }}</td>
                                                                     </tr>
 
+                                                                    {% for c in customers %}
                                                                     <tr class="hidden">
-                                                                        <td style="opacity: 0.5;">PROVISIONS</td>
-                                                                        <td class="text-center">0</td>
-                                                                        <td class="text-center">0</td>
+                                                                        <td style="opacity: 0.5;">{{c.first_name}} {{c.last_name}}</td>
+                                                                        <td class="text-center">0.00</td>
+                                                                        <td class="text-center">{{c.current_balance}}</td>
                                                                     </tr>
+                                                                    {% endfor %}
 
                                                                     <tr class="clickable-row">
 
@@ -460,8 +461,8 @@
                                                                     <tr class="clickable-row">
 
                                                                         <td>CURRENT ASSETS</td>
-                                                                        <td class="text-center">0</td>
-                                                                        <td class="text-center">0</td>
+                                                                        <td class="text-center">{{ total|default:0|floatformat:2 }}</td>
+                                                                        <td class="text-center">0.00</td>
 
                                                                     </tr>
 
@@ -477,33 +478,35 @@
                                                                     </tr>
                                                                     <tr class="hidden">
                                                                         <td style="opacity: 0.5;">LOANS & ADVANCES (ASSETS)</td>
-                                                                        <td class="text-center">0</td>
-                                                                        <td class="text-center">0</td>
+                                                                        <td class="text-center">{{ total_emp|default:0|floatformat:2 }}</td>
+                                                                        <td class="text-center">0.00</td>
                                                                     </tr>
                                                                     <tr class="hidden clickable-row ">
                                                                         <td style="opacity: 0.5;">SUNDRY DEBITORS</td>
-                                                                        <td class="text-center">0</td>
-                                                                        <td class="text-center">0</td>
+                                                                        <td class="text-center">{{ total_ven|default:0|floatformat:2 }}</td>
+                                                                        <td class="text-center">0.00</td>
                                                                     </tr>
 
+                                                                    {% for i in vendor %}
                                                                     <tr class="hidden">
-                                                                        <td style="opacity: 0.5;">LOANS & ADVANCES (ASSETS)</td>
-                                                                        <td class="text-center">0</td>
-                                                                        <td class="text-center">0</td>
+                                                                        <td style="opacity: 0.5;">{{i.first_name}} {{i.last_name}}</td>
+                                                                        <td class="text-center">{{i.current_balance}}</td>
+                                                                        <td class="text-center">0.00</td>
                                                                     </tr>
+                                                                    {% endfor %}
 
                                                                     <tr>
 
                                                                         <td>SALES ACCOUNT</td>
-                                                                        <td class="text-center">0</td>
-                                                                        <td class="text-center">0</td>
+                                                                        <td class="text-center">{{ total_crenote|default:0|floatformat:2 }}</td>
+                                                                        <td class="text-center">{{ total_sales|default:0|floatformat:2 }}</td>
 
                                                                     </tr>
 
                                                                     <tr>
 
                                                                         <td>PURCHASE ACCOUNT</td>
-                                                                        <td class="text-center">0</td>
+                                                                        <td class="text-center">{{ total_purchase|default:0|floatformat:2 }}</td>
                                                                         <td class="text-center">0</td>
 
                                                                     </tr>
@@ -519,16 +522,24 @@
                                                                     <tr>
 
                                                                         <td>DEFERENCE IN OPENING BALANCE</td>
-                                                                        <td class="text-center">0</td>
-                                                                        <td class="text-center">0</td>
+                                                                        {% if difference_d < difference_c %}
+                                                                        <td class="text-center">0.00</td>
+                                                                        <td class="text-center">{{difference|default:0|floatformat:2}}</td>
+                                                                        {% elif difference_c < difference_d %}
+                                                                        <td class="text-center">{{difference|default:0|floatformat:2}}</td>
+                                                                        <td class="text-center">0.00</td>
+                                                                        {% else %}
+                                                                        <td class="text-center">0.00</td>
+                                                                        <td class="text-center">0.00</td>
+                                                                        {% endif %}
 
                                                                     </tr>
 
                                                                     <tr>
 
                                                                         <td>TOTAL AMOUNT</td>
-                                                                        <td class="text-center">0</td>
-                                                                        <td class="text-center">0</td>
+                                                                        <td class="text-center">{{tot|default:0|floatformat:2}}</td>
+                                                                        <td class="text-center">{{tot|default:0|floatformat:2}}</td>
 
                                                                     </tr>
 
@@ -538,29 +549,7 @@
                                                             </table>
                                                         </section>
 
-                                                        <section class="balance-info text-dark">
-                                                            <div class="text-center me-2"
-                                                                style="display: flex;justify-content: end;">
-                                                                <div>
-                                                                    <h5
-                                                                        style="padding-top: 80px; color: #000; font-weight: bold;">
-                                                                        Total Sales</h5>
-                                                                    <h4 class="text-dark" style="font-weight: 600;"
-                                                                        id="totvalue">₹<span
-                                                                            id="superTotal">{{total_price|default:0|floatformat:2}}</span>
-                                                                    </h4>
-                                                                </div>
-                                                                <div style="margin-left: 2rem;">
-                                                                    <h5
-                                                                        style="padding-top: 80px; color: #000; font-weight: bold;">
-                                                                        Total Purchase</h5>
-                                                                    <h4 class="text-dark" style="font-weight: 600;"
-                                                                        id="totvalue">₹<span
-                                                                            id="superTotal">{{bill_total|default:0|floatformat:2}}</span>
-                                                                    </h4>
-                                                                </div>
-                                                            </div>
-                                                        </section>
+                                                        
 
 
                                                     </div>
@@ -579,15 +568,14 @@
                         <div class="modal-dialog">
                             <div class="modal-content" style="background-color: #3b3b3b;">
                                 <div class="modal-header">
-                                    <h3 class="modal-title text-light" id="exampleModalLabel">Share sale purchase by
-                                        party Report</h3>
+                                    <h3 class="modal-title text-light" id="exampleModalLabel">Share Trail Balance</h3>
                                     <button type="button" class="btn btn-danger close px-2 py-0" data-bs-dismiss="modal"
                                         aria-label="Close">
                                         <span aria-hidden="true" style="font-size: x-large;">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body mx-3" style="background-color: #000;">
-                                    <form action="{% url 'share_mail' %}" method="POST" id="share_to_email_form"
+                                    <form action="{% url 'share_mail_trail' %}" method="POST" id="share_to_email_form"
                                         class="needs-validation" novalidate enctype="multipart/form-data">
                                         {%csrf_token%}
                                         <div class="form-group">
@@ -711,7 +699,7 @@
                             var opt =
                             {
                                 margin: [0.5, 0.3, 0.3, 0.5],
-                                filename: 'Report_Sales_Purchase_BY_Party',
+                                filename: 'Report_Trail_Balance',
                                 image: { type: 'jpeg', quality: 0.98 },
                                 html2canvas: { scale: 2 },
                                 jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' }
@@ -738,7 +726,7 @@
                             const ws = XLSX.utils.table_to_sheet(Table);
                             const wb = XLSX.utils.book_new();
                             XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-                            XLSX.writeFile(wb, "Report_Sales_Purchase_Party.xlsx");
+                            XLSX.writeFile(wb, "Report_Trail_Balance.xlsx");
                         }
 
                         let sortOrder = false; // false for ascending, true for descending

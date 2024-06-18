@@ -1161,6 +1161,7 @@ urlpatterns = [
 
     #================================Trail Balance==============================
     path('trail_balance',views.trailbalance,name='trail_balance'),
+    path('share_mail_trail',views.share_mail_trail,name='share_mail_trail'),
     
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
 ]

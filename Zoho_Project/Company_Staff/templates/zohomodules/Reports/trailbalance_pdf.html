@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zoho</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<style>
+    #table1 {
+    border-collapse: collapse;
+    width: 100%;
+    }
+
+    #table1 th, #table1 td {
+    border: 1px solid #dddddd;
+    padding: 5px 2px;
+    /* text-align: left; */
+    }
+
+    #table1 th {
+    background-color: #f2f2f2;
+    }
+
+    body {
+        font-size: 14px;
+    }
+
+    .invoice_data {
+        font-size: 1.2rem;
+    }
+
+    .data_row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .data_1, .data_2 {
+        font-weight: bold;
+    }
+
+    .data_value {
+        flex: 1;
+        text-align: right;
+    }
+
+    .balance_info{
+        display: flex;
+        justify-content: start;
+        align-items: center;
+    }
+    .balance_info .bal_head{
+        width: 48%;
+    }
+
+    .bal_value{
+        width: 48%;
+        flex: 1;
+        text-align: right;
+    }
+
+
+
+
+
+</style>
+
+<body>
+    <div class="my-5 page" size="A4">
+        <div class="p-5">
+            <div id="ember2512" class="row tooltip-container ember-view text-ellipsis" style="display: flex; justify-content: space-between;">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <center style="color: black;">
+                        <p> {{cmp.company_name}}</p>
+                        <b>
+                            <p style="font-size: 1.3rem;">Trail Balance</p>
+                        </b>
+                    </center>
+                    
+                </div>
+                <hr>
+                <section class="product-area mt-2">
+                    <table class="table table-responsive-md mt-4 table-hover"
+                        id="reportTable" id="expandableTable">
+                        <thead>
+                            <tr>
+                                <th class="text-center">PARTICULARS </th>
+                                <th class="text-center">DEBIT</th>
+                                <th class="text-center">CREDIT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="clickable-row">
+                                <td>CAPITAL ACCOUNT</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                              
+                            </tr>
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">DRAWINGS OF OWNER</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                               
+                            </tr>
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">OWNERS CAPITAL</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                                
+                            </tr>
+
+                            <tr class="clickable-row">
+
+                                <td>LOANS</td>
+                                <td class="text-center">{{ total_debit|default:0|floatformat:2 }}</td>
+                                <td class="text-center">{{ total_credit|default:0|floatformat:2 }}</td>
+
+                            </tr>
+
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">BANK A/C</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                            </tr>
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">SECURED LOANS</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                            </tr>
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">BANK LOANS</td>
+                                
+                                <td class="text-center">{{ total_debit|default:0|floatformat:2 }}</td>
+                                
+                                <td class="text-center">{{ total_credit|default:0|floatformat:2 }}</td>
+                            </tr>
+
+                            <tr class="clickable-row">
+
+                                <td>CURRENT LIABILITIES</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">{{ total_cus|default:0|floatformat:2 }}</td>
+
+                            </tr>
+
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">DUTIES AND TERMS</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                            </tr>
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">PROVISIONS</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                            </tr>
+                            <tr class="hidden clickable-row">
+                                <td style="opacity: 0.5;">SUNDRY CREDITORS</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">{{ total_cus|default:0|floatformat:2 }}</td>
+                            </tr>
+
+                            {% for c in customers %}
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">{{c.first_name}} {{c.last_name}}</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">{{c.current_balance}}</td>
+                            </tr>
+                            {% endfor %}
+
+                            <tr class="clickable-row">
+
+                                <td>FIXED ASSETS</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+
+                            </tr>
+
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">CUMPUTER</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                            </tr>
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">FURNITURE</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                            </tr>
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">LAND AND BULDING</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                            </tr>
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">MARUTI VAN</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                            </tr>
+
+                            <tr class="clickable-row">
+
+                                <td>INVESTMENTS</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+
+                            </tr>
+
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">COMMODITIES</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                            </tr>
+
+                            <tr class="clickable-row">
+
+                                <td>INCOME</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+
+                            </tr>
+
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">DIRECT INCOME</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                            </tr>
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">INDIRECT INCOME</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                            </tr>
+
+                            <tr class="clickable-row">
+
+                                <td>CURRENT ASSETS</td>
+                                <td class="text-center">{{ total|default:0|floatformat:2 }}</td>
+                                <td class="text-center">0.00</td>
+
+                            </tr>
+
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">OPENING STOCK</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                            </tr>
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">DEPOSITS(ASSETS)</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+                            </tr>
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">LOANS & ADVANCES (ASSETS)</td>
+                                <td class="text-center">{{ total_emp|default:0|floatformat:2 }}</td>
+                                <td class="text-center">0.00</td>
+                            </tr>
+                            <tr class="hidden clickable-row ">
+                                <td style="opacity: 0.5;">SUNDRY DEBITORS</td>
+                                <td class="text-center">{{ total_ven|default:0|floatformat:2 }}</td>
+                                <td class="text-center">0.00</td>
+                            </tr>
+
+                            {% for i in vendor %}
+                            <tr class="hidden">
+                                <td style="opacity: 0.5;">{{i.first_name}} {{i.last_name}}</td>
+                                <td class="text-center">{{i.current_balance}}</td>
+                                <td class="text-center">0.00</td>
+                            </tr>
+                            {% endfor %}
+
+                            <tr>
+
+                                <td>SALES ACCOUNT</td>
+                                <td class="text-center">{{ total_crenote|default:0|floatformat:2 }}</td>
+                                <td class="text-center">{{ total_sales|default:0|floatformat:2 }}</td>
+
+                            </tr>
+
+                            <tr>
+
+                                <td>PURCHASE ACCOUNT</td>
+                                <td class="text-center">{{ total_purchase|default:0|floatformat:2 }}</td>
+                                <td class="text-center">0</td>
+
+                            </tr>
+
+                            <tr>
+
+                                <td>EXPENSES</td>
+                                <td class="text-center">0</td>
+                                <td class="text-center">0</td>
+
+                            </tr>
+
+                            <tr>
+
+                                <td>DEFERENCE IN OPENING BALANCE</td>
+                                {% if difference_d < difference_c %}
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">{{difference|default:0|floatformat:2}}</td>
+                                {% elif difference_c < difference_d %}
+                                <td class="text-center">{{difference|default:0|floatformat:2}}</td>
+                                <td class="text-center">0.00</td>
+                                {% else %}
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
+                                {% endif %}
+
+                            </tr>
+
+                            <tr>
+
+                                <td>TOTAL AMOUNT</td>
+                                <td class="text-center">{{tot|default:0|floatformat:2}}</td>
+                                <td class="text-center">{{tot|default:0|floatformat:2}}</td>
+
+                            </tr>
+
+                        </tbody>
+
+
+                    </table>
+                </section>
+        </div>
+    </div>
+</body>
+
+</html>

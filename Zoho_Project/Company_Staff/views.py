@@ -60877,7 +60877,7 @@ def share_mail(request):
             filename = f'Sales Purchase By Party Report'
             subject = f"Sales Purchase By Party Report"
             # from django.core.mail import EmailMessage as EmailMsg
-            email = EmailMsg(subject, f"Hi,\nPlease find the attached All Parties Report. \n{email_message}\n\n--\nRegards,\n{cmp.company_name}\n{cmp.address}\n{cmp.state} - {cmp.country}\n{cmp.contact}", from_email=settings.EMAIL_HOST_USER, to=emails_list)
+            email = EmailMsg(subject, f"Hi,\nPlease find the attached Sales Purchase By Party Report. \n{email_message}\n\n--\nRegards,\n{cmp.company_name}\n{cmp.address}\n{cmp.state} - {cmp.country}\n{cmp.contact}", from_email=settings.EMAIL_HOST_USER, to=emails_list)
             email.attach(filename, pdf, "application/pdf")
             email.send(fail_silently=False)
 
@@ -60900,28 +60900,395 @@ def trailbalance(request):
     if log_details.user_type == 'Company':
         dash_details = CompanyDetails.objects.get(login_details=log_details)
         cmp = dash_details
+
+    
+    if request.method == 'POST':
+        start_date_str = request.POST.get('from_date')
+        end_date_str = request.POST.get('to_date')
+
+        if start_date_str and end_date_str:
+            # Convert date strings to datetime objects
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+
+            allmodules= ZohoModules.objects.get(company=cmp,status='New')
+            data = invoice.objects.filter(company=dash_details.id, date__range=(start_date, end_date))
+            bankaccount = BankAccount.objects.filter(Q(company=dash_details.id) & Q(amount_type='credit') & Q(date__range=(start_date, end_date)))
+            bankaccount_d = BankAccount.objects.filter(Q(company=dash_details.id) & Q(amount_type='debit')  & Q(date__range=(start_date, end_date)))
+            customers = Customer.objects.filter(company=dash_details.id)
+            total_cus = Customer.objects.filter(company=dash_details.id).aggregate(total_cus=Sum('current_balance'))['total_cus'] or 0
+            vendor = Vendor.objects.filter(company=dash_details.id)
+            total_ven = Vendor.objects.filter(company=dash_details.id).aggregate(total_ven=Sum('current_balance'))['total_ven'] or 0
+            employe = EmployeeLoan.objects.filter(company=dash_details.id)
+            total_emp = EmployeeLoan.objects.filter(company=dash_details.id).aggregate(total_emp=Sum('balance'))['total_emp'] or 0
+            total = total_emp + total_ven
+            credit_note = Credit_Note.objects.filter(company=dash_details.id,credit_note_date__range=(start_date, end_date))
+            total_crenote = Credit_Note.objects.filter(company=dash_details.id,credit_note_date__range=(start_date, end_date)).aggregate(total_crenote=Sum('balance'))['total_crenote'] or 0
+            
+            total_invoice = invoice.objects.filter(company=dash_details.id,date__range=(start_date, end_date)).aggregate(total_invoice=Sum('balance'))['total_invoice'] or 0
+            total_recurring = RecurringInvoice.objects.filter(company=dash_details.id,start_date__range=(start_date, end_date)).aggregate(total_recurring=Sum('balance'))['total_recurring'] or 0
+            total_retain = RetainerInvoice.objects.filter(company=dash_details.id,retainer_invoice_date__range=(start_date, end_date)).aggregate(total_retain=Sum('balance'))['total_retain'] or 0
+            total_sales = total_invoice + total_recurring + total_retain
+            
+            total_bill = Bill.objects.filter(Company=dash_details.id,Bill_Date__range=(start_date, end_date)).aggregate(total_bill=Sum('Balance'))['total_bill'] or 0
+            total_recrringbill = Recurring_bills.objects.filter(company=dash_details.id,rec_bill_date__range=(start_date, end_date)).aggregate(total_recrringbill=Sum('bal'))['total_recrringbill'] or 0
+            total_purchase = int(total_bill) + int(total_recrringbill)
+
+            if bankaccount:
+
+                for i in bankaccount:
+                    
+                    total_credit = loan_account.objects.filter(bank_holder=i.id).aggregate(total_credit=Sum('balance'))['total_credit'] or 0
+
+                    print(total_credit)
+            else:
+                total_credit = 0
+
+            if bankaccount_d:
+                    
+
+                for s in bankaccount_d:
+                
+                    total_debit = loan_account.objects.filter(bank_holder=s.id).aggregate(total_debit=Sum('balance'))['total_debit'] or 0
+
+            else:
+                total_debit = 0
+
+
+            difference_d =  int(total) + int(total_debit) + int(total_crenote) + int(total_purchase)
+            difference_c =  int(total_cus) + int(total_sales) + int(total_credit)
+            difference = difference_d - difference_c
+            print(difference)
+
+            if difference_d < difference_c:
+                tot = int(difference_d) + int(difference)
+            else:
+                tot = 0
+
+
+            if difference_c < difference_d:
+                tot = int(difference_c) + int(difference)
+            else:
+                tot = 0
+
+            cont = {
+                'cmp':cmp,
+                'allmodules':allmodules,
+                'total_credit':total_credit,
+                'total_debit':total_debit,
+                'total_cus':total_cus,
+                'customers':customers,
+                'total_ven':total_ven,
+                'vendor':vendor,
+                'total_emp':total_emp,
+                'total':total,  
+                'total_crenote':total_crenote,
+                'total_sales':total_sales,
+                'total_purchase':total_purchase,
+                'difference_d':difference_d,
+                'difference_c':difference_c,
+                'difference':difference,
+                'tot':tot,
+            
+            }
+            return render(request,'zohomodules/Reports/trail_balance.html',cont)    
+
+
+    
+
     allmodules= ZohoModules.objects.get(company=cmp,status='New')
     bankaccount = BankAccount.objects.filter(Q(company=dash_details.id) & Q(amount_type='credit'))
     bankaccount_d = BankAccount.objects.filter(Q(company=dash_details.id) & Q(amount_type='debit'))
+    customers = Customer.objects.filter(company=dash_details.id)
+    total_cus = Customer.objects.filter(company=dash_details.id).aggregate(total_cus=Sum('current_balance'))['total_cus'] or 0
+    vendor = Vendor.objects.filter(company=dash_details.id)
+    total_ven = Vendor.objects.filter(company=dash_details.id).aggregate(total_ven=Sum('current_balance'))['total_ven'] or 0
+    employe = EmployeeLoan.objects.filter(company=dash_details.id)
+    total_emp = EmployeeLoan.objects.filter(company=dash_details.id).aggregate(total_emp=Sum('balance'))['total_emp'] or 0
+    total = total_emp + total_ven
+    credit_note = Credit_Note.objects.filter(company=dash_details.id)
+    total_crenote = Credit_Note.objects.filter(company=dash_details.id).aggregate(total_crenote=Sum('balance'))['total_crenote'] or 0
     
+    total_invoice = invoice.objects.filter(company=dash_details.id).aggregate(total_invoice=Sum('balance'))['total_invoice'] or 0
+    total_recurring = RecurringInvoice.objects.filter(company=dash_details.id).aggregate(total_recurring=Sum('balance'))['total_recurring'] or 0
+    total_retain = RetainerInvoice.objects.filter(company=dash_details.id).aggregate(total_retain=Sum('balance'))['total_retain'] or 0
+    total_sales = total_invoice + total_recurring + total_retain
+    
+    total_bill = Bill.objects.filter(Company=dash_details.id).aggregate(total_bill=Sum('Balance'))['total_bill'] or 0
+    total_recrringbill = Recurring_bills.objects.filter(company=dash_details.id).aggregate(total_recrringbill=Sum('bal'))['total_recrringbill'] or 0
+    total_purchase = int(total_bill) + int(total_recrringbill)
 
-    for i in bankaccount:
-        
-        loan_c = loan_account.objects.filter(company=i.company)
-    
-        total_credit = loan_c.aggregate(total_credit=Sum('balance'))['total_credit'] or 0
-    
-   
-        
+    if bankaccount:
 
-    
+        for i in bankaccount:
+                    
+            total_credit = loan_account.objects.filter(bank_holder=i.id).aggregate(total_credit=Sum('balance'))['total_credit'] or 0
+
+            print(total_credit)
+    else:
+        total_credit = 0
+
+    if bankaccount_d:
+                    
+
+        for s in bankaccount_d:
+                
+            total_debit = loan_account.objects.filter(bank_holder=s.id).aggregate(total_debit=Sum('balance'))['total_debit'] or 0
+
+    else:
+        total_debit = 0
+
+
+    difference_d =  int(total) + int(total_debit) + int(total_crenote) + int(total_purchase)
+    difference_c =  int(total_cus) + int(total_sales) + int(total_credit)
+    difference = difference_d - difference_c
+    print(difference)
+
+    if difference_d < difference_c:
+        tot = int(difference_d) + int(difference)
+    else:
+        tot = 0
+
+
+    if difference_c < difference_d:
+        tot = int(difference_c) + int(difference)
+    else:
+        tot = 0
+
 
     context = {
         'cmp':cmp,
         'allmodules':allmodules,
         'total_credit':total_credit,
-       
-        
+        'total_debit':total_debit,
+        'total_cus':total_cus,
+        'customers':customers,
+        'total_ven':total_ven,
+        'vendor':vendor,
+        'total_emp':total_emp,
+        'total':total,  
+        'total_crenote':total_crenote,
+        'total_sales':total_sales,
+        'total_purchase':total_purchase,
+        'difference_d':difference_d,
+        'difference_c':difference_c,
+        'difference':difference,
+        'tot':tot,
        
     }
     return render(request,'zohomodules/Reports/trail_balance.html',context)
+
+def share_mail_trail(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Staff':
+            dash_details = StaffDetails.objects.get(login_details=log_details)
+            cmp = dash_details.company
+        if log_details.user_type == 'Company':
+            dash_details = CompanyDetails.objects.get(login_details=log_details)
+            cmp = dash_details
+
+        
+        if request.method == 'POST':
+            emails_string = request.POST['email_ids']
+
+                
+            emails_list = [email.strip() for email in emails_string.split(',')]
+            email_message = request.POST['email_message']
+            start_date_str = request.POST.get('from_date')
+            end_date_str = request.POST.get('to_date')
+
+            if start_date_str and end_date_str:
+                # Convert date strings to datetime objects
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+                end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+
+                allmodules= ZohoModules.objects.get(company=cmp,status='New')
+                data = invoice.objects.filter(company=dash_details.id, date__range=(start_date, end_date))
+                bankaccount = BankAccount.objects.filter(Q(company=dash_details.id) & Q(amount_type='credit') & Q(date__range=(start_date, end_date)))
+                bankaccount_d = BankAccount.objects.filter(Q(company=dash_details.id) & Q(amount_type='debit')  & Q(date__range=(start_date, end_date)))
+                customers = Customer.objects.filter(company=dash_details.id)
+                total_cus = Customer.objects.filter(company=dash_details.id).aggregate(total_cus=Sum('current_balance'))['total_cus'] or 0
+                vendor = Vendor.objects.filter(company=dash_details.id)
+                total_ven = Vendor.objects.filter(company=dash_details.id).aggregate(total_ven=Sum('current_balance'))['total_ven'] or 0
+                employe = EmployeeLoan.objects.filter(company=dash_details.id)
+                total_emp = EmployeeLoan.objects.filter(company=dash_details.id).aggregate(total_emp=Sum('balance'))['total_emp'] or 0
+                total = total_emp + total_ven
+                credit_note = Credit_Note.objects.filter(company=dash_details.id,credit_note_date__range=(start_date, end_date))
+                total_crenote = Credit_Note.objects.filter(company=dash_details.id,credit_note_date__range=(start_date, end_date)).aggregate(total_crenote=Sum('balance'))['total_crenote'] or 0
+                
+                total_invoice = invoice.objects.filter(company=dash_details.id,date__range=(start_date, end_date)).aggregate(total_invoice=Sum('balance'))['total_invoice'] or 0
+                total_recurring = RecurringInvoice.objects.filter(company=dash_details.id,start_date__range=(start_date, end_date)).aggregate(total_recurring=Sum('balance'))['total_recurring'] or 0
+                total_retain = RetainerInvoice.objects.filter(company=dash_details.id,retainer_invoice_date__range=(start_date, end_date)).aggregate(total_retain=Sum('balance'))['total_retain'] or 0
+                total_sales = total_invoice + total_recurring + total_retain
+                
+                total_bill = Bill.objects.filter(Company=dash_details.id,Bill_Date__range=(start_date, end_date)).aggregate(total_bill=Sum('Balance'))['total_bill'] or 0
+                total_recrringbill = Recurring_bills.objects.filter(company=dash_details.id,rec_bill_date__range=(start_date, end_date)).aggregate(total_recrringbill=Sum('bal'))['total_recrringbill'] or 0
+                total_purchase = int(total_bill) + int(total_recrringbill)
+
+                if bankaccount:
+
+                    for i in bankaccount:
+                        
+                        total_credit = loan_account.objects.filter(bank_holder=i.id).aggregate(total_credit=Sum('balance'))['total_credit'] or 0
+
+                        print(total_credit)
+                else:
+                    total_credit = 0
+
+                if bankaccount_d:
+                        
+
+                    for s in bankaccount_d:
+                    
+                        total_debit = loan_account.objects.filter(bank_holder=s.id).aggregate(total_debit=Sum('balance'))['total_debit'] or 0
+
+                else:
+                    total_debit = 0
+
+
+                difference_d =  int(total) + int(total_debit) + int(total_crenote) + int(total_purchase)
+                difference_c =  int(total_cus) + int(total_sales) + int(total_credit)
+                difference = difference_d - difference_c
+                print(difference)
+
+                if difference_d < difference_c:
+                    tot = int(difference_d) + int(difference)
+                else:
+                    tot = 0
+
+
+                if difference_c < difference_d:
+                    tot = int(difference_c) + int(difference)
+                else:
+                    tot = 0
+
+                cont = {
+                    'cmp':cmp,
+                    'allmodules':allmodules,
+                    'total_credit':total_credit,
+                    'total_debit':total_debit,
+                    'total_cus':total_cus,
+                    'customers':customers,
+                    'total_ven':total_ven,
+                    'vendor':vendor,
+                    'total_emp':total_emp,
+                    'total':total,  
+                    'total_crenote':total_crenote,
+                    'total_sales':total_sales,
+                    'total_purchase':total_purchase,
+                    'difference_d':difference_d,
+                    'difference_c':difference_c,
+                    'difference':difference,
+                    'tot':tot,
+                
+                }
+                    
+
+
+        
+
+            allmodules= ZohoModules.objects.get(company=cmp,status='New')
+            bankaccount = BankAccount.objects.filter(Q(company=dash_details.id) & Q(amount_type='credit'))
+            bankaccount_d = BankAccount.objects.filter(Q(company=dash_details.id) & Q(amount_type='debit'))
+            customers = Customer.objects.filter(company=dash_details.id)
+            total_cus = Customer.objects.filter(company=dash_details.id).aggregate(total_cus=Sum('current_balance'))['total_cus'] or 0
+            vendor = Vendor.objects.filter(company=dash_details.id)
+            total_ven = Vendor.objects.filter(company=dash_details.id).aggregate(total_ven=Sum('current_balance'))['total_ven'] or 0
+            employe = EmployeeLoan.objects.filter(company=dash_details.id)
+            total_emp = EmployeeLoan.objects.filter(company=dash_details.id).aggregate(total_emp=Sum('balance'))['total_emp'] or 0
+            total = total_emp + total_ven
+            credit_note = Credit_Note.objects.filter(company=dash_details.id)
+            total_crenote = Credit_Note.objects.filter(company=dash_details.id).aggregate(total_crenote=Sum('balance'))['total_crenote'] or 0
+            
+            total_invoice = invoice.objects.filter(company=dash_details.id).aggregate(total_invoice=Sum('balance'))['total_invoice'] or 0
+            total_recurring = RecurringInvoice.objects.filter(company=dash_details.id).aggregate(total_recurring=Sum('balance'))['total_recurring'] or 0
+            total_retain = RetainerInvoice.objects.filter(company=dash_details.id).aggregate(total_retain=Sum('balance'))['total_retain'] or 0
+            total_sales = total_invoice + total_recurring + total_retain
+            
+            total_bill = Bill.objects.filter(Company=dash_details.id).aggregate(total_bill=Sum('Balance'))['total_bill'] or 0
+            total_recrringbill = Recurring_bills.objects.filter(company=dash_details.id).aggregate(total_recrringbill=Sum('bal'))['total_recrringbill'] or 0
+            total_purchase = int(total_bill) + int(total_recrringbill)
+
+            if bankaccount:
+
+                for i in bankaccount:
+                            
+                    total_credit = loan_account.objects.filter(bank_holder=i.id).aggregate(total_credit=Sum('balance'))['total_credit'] or 0
+
+                    print(total_credit)
+            else:
+                total_credit = 0
+
+            if bankaccount_d:
+                            
+
+                for s in bankaccount_d:
+                        
+                    total_debit = loan_account.objects.filter(bank_holder=s.id).aggregate(total_debit=Sum('balance'))['total_debit'] or 0
+
+            else:
+                total_debit = 0
+
+
+            difference_d =  int(total) + int(total_debit) + int(total_crenote) + int(total_purchase)
+            difference_c =  int(total_cus) + int(total_sales) + int(total_credit)
+            difference = difference_d - difference_c
+            print(difference)
+
+            if difference_d < difference_c:
+                tot = int(difference_d) + int(difference)
+            else:
+                tot = 0
+
+
+            if difference_c < difference_d:
+                tot = int(difference_c) + int(difference)
+            else:
+                tot = 0
+
+
+            context = {
+                'cmp':cmp,
+                'allmodules':allmodules,
+                'total_credit':total_credit,
+                'total_debit':total_debit,
+                'total_cus':total_cus,
+                'customers':customers,
+                'total_ven':total_ven,
+                'vendor':vendor,
+                'total_emp':total_emp,
+                'total':total,  
+                'total_crenote':total_crenote,
+                'total_sales':total_sales,
+                'total_purchase':total_purchase,
+                'difference_d':difference_d,
+                'difference_c':difference_c,
+                'difference':difference,
+                'tot':tot,
+            
+            }
+        
+            template_path = 'zohomodules/Reports/trailbalance_pdf.html'
+            template = get_template(template_path)
+
+            html  = template.render(context)
+            print('for loop executed')
+            for i in emails_list:
+                print(i)
+            result = BytesIO()
+
+            pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
+            pdf = result.getvalue()
+                    
+            filename = f'Trail Balance Report'
+            subject = f"Trail Balance Report"
+            # from django.core.mail import EmailMessage as EmailMsg
+            email = EmailMsg(subject, f"Hi,\nPlease find the attached Trail Balance Report. \n{email_message}\n\n--\nRegards,\n{cmp.company_name}\n{cmp.address}\n{cmp.state} - {cmp.country}\n{cmp.contact}", from_email=settings.EMAIL_HOST_USER, to=emails_list)
+            email.attach(filename, pdf, "application/pdf")
+            email.send(fail_silently=False)
+
+            messages.success(request, 'Trail Balance Report details has been shared via email successfully..!')
+            return redirect('trail_balance')
+        return redirect('trail_balance')
