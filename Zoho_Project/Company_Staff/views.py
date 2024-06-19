@@ -60934,6 +60934,30 @@ def trailbalance(request):
             total_recrringbill = Recurring_bills.objects.filter(company=dash_details.id,rec_bill_date__range=(start_date, end_date)).aggregate(total_recrringbill=Sum('bal'))['total_recrringbill'] or 0
             total_purchase = int(total_bill) + int(total_recrringbill)
 
+            total_expense = Expense.objects.filter(company=dash_details.id).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+            total_recurring_expense = Recurring_Expense.objects.filter(company=dash_details.id,exp_date__range=(start_date, end_date)).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+            total_ex = int(total_expense) + int(total_recurring_expense)
+
+            total_discount_paidrecurring = Reccurring_Invoice_item.objects.filter(company=dash_details.id).aggregate(total_discount_paidrecurring=Sum('discount'))['total_discount_paidrecurring'] or 0
+            total_discount_paidinvoice = invoiceitems.objects.filter(company=dash_details.id).aggregate(total_discount_paidinvoice=Sum('discount'))['total_discount_paidinvoice'] or 0
+            total_discount_paid = int(total_discount_paidrecurring) + int(total_discount_paidinvoice)
+
+            total_expen = total_ex + total_discount_paid
+
+            total_discount_receivedbill = BillItems.objects.filter(Company=dash_details.id).aggregate(total_discount_receivedbill=Sum('discount'))['total_discount_receivedbill'] or 0
+            recur = Recurring_bills.objects.filter(company=dash_details.id)
+
+
+            if recur:
+
+                for s in recur:
+                    
+                    total_discount_billrecurrimg = RecurrItemsList.objects.filter(recurr_bill_id=s.id).aggregate(total_discount_billrecurrimg=Sum('discount'))['total_discount_billrecurrimg'] or 0
+            else:
+                total_discount_billrecurrimg = 0
+
+            tot_discount_receive = int(total_discount_receivedbill) + int(total_discount_billrecurrimg)
+
             if bankaccount:
 
                 for i in bankaccount:
@@ -60955,18 +60979,14 @@ def trailbalance(request):
                 total_debit = 0
 
 
-            difference_d =  int(total) + int(total_debit) + int(total_crenote) + int(total_purchase)
-            difference_c =  int(total_cus) + int(total_sales) + int(total_credit)
+            difference_d =  int(total) + int(total_debit) + int(total_crenote) + int(total_purchase) + int(total_expen)
+            difference_c =  int(total_cus) + int(total_sales) + int(total_credit) + int(tot_discount_receive)
             difference = difference_d - difference_c
             print(difference)
 
             if difference_d < difference_c:
                 tot = int(difference_d) + int(difference)
-            else:
-                tot = 0
-
-
-            if difference_c < difference_d:
+            elif difference_c < difference_d:
                 tot = int(difference_c) + int(difference)
             else:
                 tot = 0
@@ -60989,6 +61009,14 @@ def trailbalance(request):
                 'difference_c':difference_c,
                 'difference':difference,
                 'tot':tot,
+                'start_date':start_date,
+                'end_date':end_date,
+                'total_expense':total_expense,
+                'total_ex':total_ex,
+                'total_recurring_expense':total_recurring_expense,
+                'total_discount_paid':total_discount_paid,
+                'total_expen':total_expen,
+                'tot_discount_receive':tot_discount_receive,
             
             }
             return render(request,'zohomodules/Reports/trail_balance.html',cont)    
@@ -61018,13 +61046,37 @@ def trailbalance(request):
     total_recrringbill = Recurring_bills.objects.filter(company=dash_details.id).aggregate(total_recrringbill=Sum('bal'))['total_recrringbill'] or 0
     total_purchase = int(total_bill) + int(total_recrringbill)
 
+    total_expense = Expense.objects.filter(company=dash_details.id).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+    total_recurring_expense = Recurring_Expense.objects.filter(company=dash_details.id).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+    total_ex = int(total_expense) + int(total_recurring_expense)
+
+    total_discount_paidrecurring = Reccurring_Invoice_item.objects.filter(company=dash_details.id).aggregate(total_discount_paidrecurring=Sum('discount'))['total_discount_paidrecurring'] or 0
+    total_discount_paidinvoice = invoiceitems.objects.filter(company=dash_details.id).aggregate(total_discount_paidinvoice=Sum('discount'))['total_discount_paidinvoice'] or 0
+    total_discount_paid = int(total_discount_paidrecurring) + int(total_discount_paidinvoice)
+
+    total_expen = total_ex + total_discount_paid 
+
+    total_discount_receivedbill = BillItems.objects.filter(Company=dash_details.id).aggregate(total_discount_receivedbill=Sum('discount'))['total_discount_receivedbill'] or 0
+    recur = Recurring_bills.objects.filter(company=dash_details.id)
+
+
+    if recur:
+
+        for s in recur:
+            
+            total_discount_billrecurrimg = RecurrItemsList.objects.filter(recurr_bill_id=s.id).aggregate(total_discount_billrecurrimg=Sum('discount'))['total_discount_billrecurrimg'] or 0
+    else:
+        total_discount_billrecurrimg = 0
+
+    tot_discount_receive = int(total_discount_receivedbill) + int(total_discount_billrecurrimg)
+
     if bankaccount:
 
         for i in bankaccount:
                     
             total_credit = loan_account.objects.filter(bank_holder=i.id).aggregate(total_credit=Sum('balance'))['total_credit'] or 0
 
-            print(total_credit)
+           
     else:
         total_credit = 0
 
@@ -61039,18 +61091,15 @@ def trailbalance(request):
         total_debit = 0
 
 
-    difference_d =  int(total) + int(total_debit) + int(total_crenote) + int(total_purchase)
-    difference_c =  int(total_cus) + int(total_sales) + int(total_credit)
+    difference_d =  int(total) + int(total_debit) + int(total_crenote) + int(total_purchase) + int(total_expen)
+    difference_c =  int(total_cus) + int(total_sales) + int(total_credit) + int(tot_discount_receive)
     difference = difference_d - difference_c
-    print(difference)
+    
 
     if difference_d < difference_c:
         tot = int(difference_d) + int(difference)
-    else:
-        tot = 0
 
-
-    if difference_c < difference_d:
+    elif difference_c < difference_d:
         tot = int(difference_c) + int(difference)
     else:
         tot = 0
@@ -61074,6 +61123,13 @@ def trailbalance(request):
         'difference_c':difference_c,
         'difference':difference,
         'tot':tot,
+        'total_expense':total_expense,
+        'total_ex':total_ex,
+        'total_recurring_expense':total_recurring_expense,
+        'total_discount_paid':total_discount_paid,
+        'total_expen':total_expen,
+        'tot_discount_receive':tot_discount_receive
+        
        
     }
     return render(request,'zohomodules/Reports/trail_balance.html',context)
@@ -61127,6 +61183,31 @@ def share_mail_trail(request):
                 total_recrringbill = Recurring_bills.objects.filter(company=dash_details.id,rec_bill_date__range=(start_date, end_date)).aggregate(total_recrringbill=Sum('bal'))['total_recrringbill'] or 0
                 total_purchase = int(total_bill) + int(total_recrringbill)
 
+                total_expense = Expense.objects.filter(company=dash_details.id).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+                total_recurring_expense = Recurring_Expense.objects.filter(company=dash_details.id,exp_date__range=(start_date, end_date)).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+                total_ex = int(total_expense) + int(total_recurring_expense)
+
+                total_discount_paidrecurring = Reccurring_Invoice_item.objects.filter(company=dash_details.id).aggregate(total_discount_paidrecurring=Sum('discount'))['total_discount_paidrecurring'] or 0
+                total_discount_paidinvoice = invoiceitems.objects.filter(company=dash_details.id).aggregate(total_discount_paidinvoice=Sum('discount'))['total_discount_paidinvoice'] or 0
+                total_discount_paid = int(total_discount_paidrecurring) + int(total_discount_paidinvoice)
+
+                total_expen = total_ex + total_discount_paid
+
+                total_discount_receivedbill = BillItems.objects.filter(Company=dash_details.id).aggregate(total_discount_receivedbill=Sum('discount'))['total_discount_receivedbill'] or 0
+                recur = Recurring_bills.objects.filter(company=dash_details.id)
+
+
+                if recur:
+
+                    for s in recur:
+                        
+                        total_discount_billrecurrimg = RecurrItemsList.objects.filter(recurr_bill_id=s.id).aggregate(total_discount_billrecurrimg=Sum('discount'))['total_discount_billrecurrimg'] or 0
+                else:
+                    total_discount_billrecurrimg = 0
+
+                tot_discount_receive = int(total_discount_receivedbill) + int(total_discount_billrecurrimg)
+                
+
                 if bankaccount:
 
                     for i in bankaccount:
@@ -61148,18 +61229,14 @@ def share_mail_trail(request):
                     total_debit = 0
 
 
-                difference_d =  int(total) + int(total_debit) + int(total_crenote) + int(total_purchase)
-                difference_c =  int(total_cus) + int(total_sales) + int(total_credit)
+                difference_d =  int(total) + int(total_debit) + int(total_crenote) + int(total_purchase) + int(total_expen)
+                difference_c =  int(total_cus) + int(total_sales) + int(total_credit) + int(total_discount_billrecurrimg)
                 difference = difference_d - difference_c
                 print(difference)
 
                 if difference_d < difference_c:
                     tot = int(difference_d) + int(difference)
-                else:
-                    tot = 0
-
-
-                if difference_c < difference_d:
+                elif difference_c < difference_d:
                     tot = int(difference_c) + int(difference)
                 else:
                     tot = 0
@@ -61182,6 +61259,12 @@ def share_mail_trail(request):
                     'difference_c':difference_c,
                     'difference':difference,
                     'tot':tot,
+                    'total_expense':total_expense,
+                    'total_ex':total_ex,
+                    'total_recurring_expense':total_recurring_expense,
+                    'total_discount_paid':total_discount_paid,
+                    'total_expen':total_expen,
+                    'total_discount_billrecurrimg':total_discount_billrecurrimg,
                 
                 }
                     
@@ -61211,6 +61294,30 @@ def share_mail_trail(request):
             total_recrringbill = Recurring_bills.objects.filter(company=dash_details.id).aggregate(total_recrringbill=Sum('bal'))['total_recrringbill'] or 0
             total_purchase = int(total_bill) + int(total_recrringbill)
 
+            total_expense = Expense.objects.filter(company=dash_details.id).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+            total_recurring_expense = Recurring_Expense.objects.filter(company=dash_details.id).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
+            total_ex = int(total_expense) + int(total_recurring_expense)
+
+            total_discount_paidrecurring = Reccurring_Invoice_item.objects.filter(company=dash_details.id).aggregate(total_discount_paidrecurring=Sum('discount'))['total_discount_paidrecurring'] or 0
+            total_discount_paidinvoice = invoiceitems.objects.filter(company=dash_details.id).aggregate(total_discount_paidinvoice=Sum('discount'))['total_discount_paidinvoice'] or 0
+            total_discount_paid = int(total_discount_paidrecurring) + int(total_discount_paidinvoice)
+
+            total_expen = total_ex + total_discount_paid
+
+            total_discount_receivedbill = BillItems.objects.filter(Company=dash_details.id).aggregate(total_discount_receivedbill=Sum('discount'))['total_discount_receivedbill'] or 0
+            recur = Recurring_bills.objects.filter(company=dash_details.id)
+
+
+            if recur:
+
+                for s in recur:
+                        
+                    total_discount_billrecurrimg = RecurrItemsList.objects.filter(recurr_bill_id=s.id).aggregate(total_discount_billrecurrimg=Sum('discount'))['total_discount_billrecurrimg'] or 0
+            else:
+                total_discount_billrecurrimg = 0
+
+            tot_discount_receive = int(total_discount_receivedbill) + int(total_discount_billrecurrimg)
+
             if bankaccount:
 
                 for i in bankaccount:
@@ -61232,18 +61339,14 @@ def share_mail_trail(request):
                 total_debit = 0
 
 
-            difference_d =  int(total) + int(total_debit) + int(total_crenote) + int(total_purchase)
-            difference_c =  int(total_cus) + int(total_sales) + int(total_credit)
+            difference_d =  int(total) + int(total_debit) + int(total_crenote) + int(total_purchase) + int(total_expen)
+            difference_c =  int(total_cus) + int(total_sales) + int(total_credit) + int(total_discount_billrecurrimg)
             difference = difference_d - difference_c
             print(difference)
 
             if difference_d < difference_c:
                 tot = int(difference_d) + int(difference)
-            else:
-                tot = 0
-
-
-            if difference_c < difference_d:
+            elif difference_c < difference_d:
                 tot = int(difference_c) + int(difference)
             else:
                 tot = 0
@@ -61267,6 +61370,12 @@ def share_mail_trail(request):
                 'difference_c':difference_c,
                 'difference':difference,
                 'tot':tot,
+                'total_expense':total_expense,
+                'total_ex':total_ex,
+                'total_recurring_expense':total_recurring_expense,
+                'total_discount_paid':total_discount_paid,
+                'total_expen':total_expen,
+                'total_discount_billrecurrimg':total_discount_billrecurrimg,
             
             }
         

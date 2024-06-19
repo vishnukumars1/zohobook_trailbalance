@@ -89,7 +89,7 @@
                 <hr>
                 <section class="product-area mt-2">
                     <table class="table table-responsive-md mt-4 table-hover"
-                        id="reportTable" id="expandableTable">
+                        id="reportTable"  id="myTable">
                         <thead>
                             <tr>
                                 <th class="text-center">PARTICULARS </th>
@@ -98,26 +98,26 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="clickable-row">
+                            <tr class="parent-row" style="font-weight: 600;">
                                 <td>CAPITAL ACCOUNT</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                               
                             </tr>
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">DRAWINGS OF OWNER</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td >DRAWINGS OF OWNER</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                                
                             </tr>
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">OWNERS CAPITAL</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>OWNERS CAPITAL</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                                 
                             </tr>
 
-                            <tr class="clickable-row">
+                            <tr class="parent-row" style="font-weight: 600;">
 
                                 <td>LOANS</td>
                                 <td class="text-center">{{ total_debit|default:0|floatformat:2 }}</td>
@@ -125,25 +125,25 @@
 
                             </tr>
 
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">BANK A/C</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>BANK A/C</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                             </tr>
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">SECURED LOANS</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>SECURED LOANS</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                             </tr>
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">BANK LOANS</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>BANK LOANS</td>
                                 
                                 <td class="text-center">{{ total_debit|default:0|floatformat:2 }}</td>
                                 
                                 <td class="text-center">{{ total_credit|default:0|floatformat:2 }}</td>
                             </tr>
 
-                            <tr class="clickable-row">
+                            <tr class="parent-row" style="font-weight: 600;">
 
                                 <td>CURRENT LIABILITIES</td>
                                 <td class="text-center">0.00</td>
@@ -151,93 +151,93 @@
 
                             </tr>
 
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">DUTIES AND TERMS</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>DUTIES AND TERMS</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                             </tr>
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">PROVISIONS</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>PROVISIONS</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                             </tr>
-                            <tr class="hidden clickable-row">
-                                <td style="opacity: 0.5;">SUNDRY CREDITORS</td>
+                            <tr class="hidden child-row parentchild-row" style="opacity: 0.7;font-size: small;">
+                                <td>SUNDRY CREDITORS</td>
                                 <td class="text-center">0.00</td>
                                 <td class="text-center">{{ total_cus|default:0|floatformat:2 }}</td>
                             </tr>
 
                             {% for c in customers %}
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">{{c.first_name}} {{c.last_name}}</td>
+                            <tr class="hidden childpar-row" style="opacity: 0.7;font-size: small;">
+                                <td>{{c.first_name}} {{c.last_name}}</td>
                                 <td class="text-center">0.00</td>
                                 <td class="text-center">{{c.current_balance}}</td>
                             </tr>
                             {% endfor %}
 
-                            <tr class="clickable-row">
+                            <tr class="parent-row" style="font-weight: 600;">
 
                                 <td>FIXED ASSETS</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
 
                             </tr>
 
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">CUMPUTER</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>CUMPUTER</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                             </tr>
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">FURNITURE</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>FURNITURE</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                             </tr>
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">LAND AND BULDING</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>LAND AND BULDING</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                             </tr>
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">MARUTI VAN</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>MARUTI VAN</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                             </tr>
 
-                            <tr class="clickable-row">
+                            <tr class="parent-row" style="font-weight: 600;">
 
                                 <td>INVESTMENTS</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
 
                             </tr>
 
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">COMMODITIES</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>COMMODITIES</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                             </tr>
 
-                            <tr class="clickable-row">
+                            <tr class="parent-row" style="font-weight: 600;">
 
                                 <td>INCOME</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">{{ tot_discount_receive|default:0|floatformat:2 }}</td>
 
                             </tr>
 
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">DIRECT INCOME</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>DIRECT INCOME</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                             </tr>
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">INDIRECT INCOME</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>INDIRECT INCOME</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">{{ tot_discount_receive|default:0|floatformat:2 }}</td>
                             </tr>
 
-                            <tr class="clickable-row">
+                            <tr class="parent-row" style="font-weight: 600;">
 
                                 <td>CURRENT ASSETS</td>
                                 <td class="text-center">{{ total|default:0|floatformat:2 }}</td>
@@ -245,36 +245,36 @@
 
                             </tr>
 
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">OPENING STOCK</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>OPENING STOCK</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                             </tr>
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">DEPOSITS(ASSETS)</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>DEPOSITS(ASSETS)</td>
+                                <td class="text-center">0.00</td>
+                                <td class="text-center">0.00</td>
                             </tr>
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">LOANS & ADVANCES (ASSETS)</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>LOANS & ADVANCES (ASSETS)</td>
                                 <td class="text-center">{{ total_emp|default:0|floatformat:2 }}</td>
                                 <td class="text-center">0.00</td>
                             </tr>
-                            <tr class="hidden clickable-row ">
-                                <td style="opacity: 0.5;">SUNDRY DEBITORS</td>
+                            <tr class="hidden child-row parentchild-row"  style="opacity: 0.7;font-size: small;">
+                                <td>SUNDRY DEBITORS</td>
                                 <td class="text-center">{{ total_ven|default:0|floatformat:2 }}</td>
                                 <td class="text-center">0.00</td>
                             </tr>
 
                             {% for i in vendor %}
-                            <tr class="hidden">
-                                <td style="opacity: 0.5;">{{i.first_name}} {{i.last_name}}</td>
+                            <tr class="hidden childpar-row" style="opacity: 0.7;font-size: small;">
+                                <td>{{i.first_name}} {{i.last_name}}</td>
                                 <td class="text-center">{{i.current_balance}}</td>
                                 <td class="text-center">0.00</td>
                             </tr>
                             {% endfor %}
 
-                            <tr>
+                            <tr style="font-weight: 600;">
 
                                 <td>SALES ACCOUNT</td>
                                 <td class="text-center">{{ total_crenote|default:0|floatformat:2 }}</td>
@@ -282,31 +282,43 @@
 
                             </tr>
 
-                            <tr>
+                            <tr style="font-weight: 600;">
 
                                 <td>PURCHASE ACCOUNT</td>
                                 <td class="text-center">{{ total_purchase|default:0|floatformat:2 }}</td>
-                                <td class="text-center">0</td>
+                                <td class="text-center">0.00</td>
 
                             </tr>
 
-                            <tr>
+                            <tr style="font-weight: 600;" class="parent-row">
 
                                 <td>EXPENSES</td>
-                                <td class="text-center">0</td>
-                                <td class="text-center">0</td>
+                                <td class="text-center">{{ total_expen|default:0|floatformat:2 }}</td>
+                                <td class="text-center">0.00</td>
 
                             </tr>
 
-                            <tr>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>DIRECT EXPENSES</td>
+                                <td class="text-center">{{ total_ex|default:0|floatformat:2 }}</td>
+                                <td class="text-center">0.00</td>
+                            </tr>
 
-                                <td>DEFERENCE IN OPENING BALANCE</td>
+                            <tr class="hidden child-row" style="opacity: 0.7;font-size: small;">
+                                <td>INDIRECT EXPENSES</td>
+                                <td class="text-center">{{ total_discount_paid|default:0|floatformat:2 }}</td>
+                                <td class="text-center">0.00</td>
+                            </tr>
+
+                            <tr style="font-weight: 600;">
+
+                                <td>DIFERENCE IN OPENING BALANCE</td>
                                 {% if difference_d < difference_c %}
-                                <td class="text-center">0.00</td>
                                 <td class="text-center">{{difference|default:0|floatformat:2}}</td>
+                                <td class="text-center">0.00</td>
                                 {% elif difference_c < difference_d %}
-                                <td class="text-center">{{difference|default:0|floatformat:2}}</td>
                                 <td class="text-center">0.00</td>
+                                <td class="text-center">{{difference|default:0|floatformat:2}}</td>
                                 {% else %}
                                 <td class="text-center">0.00</td>
                                 <td class="text-center">0.00</td>
@@ -314,19 +326,26 @@
 
                             </tr>
 
-                            <tr>
-
-                                <td>TOTAL AMOUNT</td>
-                                <td class="text-center">{{tot|default:0|floatformat:2}}</td>
-                                <td class="text-center">{{tot|default:0|floatformat:2}}</td>
-
-                            </tr>
 
                         </tbody>
 
 
                     </table>
                 </section>
+
+                <section class="balance-info text-dark">
+                    <div class="text-center me-2" style="display: flex;justify-content: end;">
+                        <div>
+                            <h5 style="padding-top: 80px; color: #000; font-weight: bold;">Total Debit Amount</h5>
+                            <h4 class="text-dark" style="font-weight: 600;" id="totvalue">₹<span id="superTotal">{{tot|default:0|floatformat:2}}</span></h4>
+                        </div>
+                        <div style="margin-left: 2rem;">
+                            <h5 style="padding-top: 80px; color: #000; font-weight: bold;">Total Credit Amount</h5>
+                            <h4 class="text-dark" style="font-weight: 600;" id="totvalue">₹<span id="superTotal">{{tot|default:0|floatformat:2}}</span></h4>
+                        </div>
+                    </div>
+                </section>
+                
         </div>
     </div>
 </body>
