@@ -61058,17 +61058,22 @@ def trailbalance(request):
 
     total_discount_receivedbill = BillItems.objects.filter(Company=dash_details.id).aggregate(total_discount_receivedbill=Sum('discount'))['total_discount_receivedbill'] or 0
     recur = Recurring_bills.objects.filter(company=dash_details.id)
-
+    print(total_discount_receivedbill)
 
     if recur:
 
         for s in recur:
             
             total_discount_billrecurrimg = RecurrItemsList.objects.filter(recurr_bill_id=s.id).aggregate(total_discount_billrecurrimg=Sum('discount'))['total_discount_billrecurrimg'] or 0
+        
     else:
         total_discount_billrecurrimg = 0
 
+    
+
     tot_discount_receive = int(total_discount_receivedbill) + int(total_discount_billrecurrimg)
+
+    
 
     if bankaccount:
 
@@ -61306,6 +61311,7 @@ def share_mail_trail(request):
 
             total_discount_receivedbill = BillItems.objects.filter(Company=dash_details.id).aggregate(total_discount_receivedbill=Sum('discount'))['total_discount_receivedbill'] or 0
             recur = Recurring_bills.objects.filter(company=dash_details.id)
+
 
 
             if recur:

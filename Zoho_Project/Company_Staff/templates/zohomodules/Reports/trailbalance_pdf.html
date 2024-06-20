@@ -312,7 +312,7 @@
 
                             <tr style="font-weight: 600;">
 
-                                <td>DIFERENCE IN OPENING BALANCE</td>
+                                <td>DIFFERENCE IN OPENING BALANCE</td>
                                 {% if difference_d < difference_c %}
                                 <td class="text-center">{{difference|default:0|floatformat:2}}</td>
                                 <td class="text-center">0.00</td>
@@ -326,6 +326,12 @@
 
                             </tr>
 
+                            <tr style="font-weight: 600;font-size: x-large;">
+                                <td >Total Amount</td>
+                                <td class="text-center">{{tot|default:0|floatformat:2}}</td>
+                                <td class="text-center">{{tot|default:0|floatformat:2}}</td>
+                            </tr>
+
 
                         </tbody>
 
@@ -333,18 +339,6 @@
                     </table>
                 </section>
 
-                <section class="balance-info text-dark">
-                    <div class="text-center me-2" style="display: flex;justify-content: end;">
-                        <div>
-                            <h5 style="padding-top: 80px; color: #000; font-weight: bold;">Total Debit Amount</h5>
-                            <h4 class="text-dark" style="font-weight: 600;" id="totvalue">₹<span id="superTotal">{{tot|default:0|floatformat:2}}</span></h4>
-                        </div>
-                        <div style="margin-left: 2rem;">
-                            <h5 style="padding-top: 80px; color: #000; font-weight: bold;">Total Credit Amount</h5>
-                            <h4 class="text-dark" style="font-weight: 600;" id="totvalue">₹<span id="superTotal">{{tot|default:0|floatformat:2}}</span></h4>
-                        </div>
-                    </div>
-                </section>
                 
         </div>
     </div>
